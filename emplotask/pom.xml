@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>niseshin</groupId>
+    <artifactId>emplotask</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+    </properties>
+    
+    <build>
+        <finalName>emplotask</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>4.2.2</version>
+                <configuration>
+                    <changeLogFile>src/main/resources/niseshin/emplotask/dbchangelog.xml</changeLogFile>
+                    <driver>org.postgresql.Driver</driver>
+                    <!-- ну очень хотелось использовать не дефолтную схему :) !создавать вручную! -->
+                    <url>jdbc:postgresql://localhost:5432/emplotask?currentSchema=emplotask</url>
+                    <username>nik</username>
+                    <password>gun</password>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- сначала создание таблиц, потом JOOQ -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>3.13.6</version>
+                <executions>
+                    <execution>
+                        <id>jooq-codegen</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration xmlns:jooq="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
+                            <!-- Configure the database connection here -->
+                            <jdbc>
+                                <driver>org.postgresql.Driver</driver>
+                                <url>jdbc:postgresql://localhost:5432/emplotask</url>
+                                <user>nik</user>
+                                <password>gun</password>
+                            </jdbc>
+                            <generator>
+                                <!-- The default code generator. You can override this one, to generate your own code style.
+                                Supported generators:
+                                - org.jooq.codegen.JavaGenerator
+                                - org.jooq.codegen.ScalaGenerator
+                                Defaults to org.jooq.codegen.JavaGenerator -->
+                                <name>org.jooq.codegen.JavaGenerator</name>
+                                <database>
+                                    <!-- The database type. The format here is:
+                                    org.jooq.meta.[database].[database]Database -->
+                                    <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                                    <!-- The database schema (or in the absence of schema support, in your RDBMS this
+                                    can be the owner, user, database name) to be generated -->
+                                    <inputSchema>emplotask</inputSchema>
+                                    <!-- All elements that are generated from your schema
+                                    (A Java regular expression. Use the pipe to separate several expressions)
+                                    Watch out for case-sensitivity. Depending on your database, this might be important! -->
+                                    <includes>.*</includes>
+                                    <!-- All elements that are excluded from your schema
+                                    (A Java regular expression. Use the pipe to separate several expressions).
+                                    Excludes match before includes, i.e. excludes have a higher priority -->
+                                    <excludes></excludes>
+                                </database>
+                                <target>
+                                    <!-- The destination package of your generated classes (within the destination directory) -->
+                                    <packageName>generated</packageName>
+                                    <!-- The destination directory of your generated classes. Using Maven directory layout here -->
+                                    <directory>src/main/java</directory>
+                                </target>
+                            </generator>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/javax/javaee-api -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>8.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.19</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.5</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jooq/jooq -->
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.13.6</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jooq/jooq-meta -->
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta</artifactId>
+            <version>3.13.6</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jooq/jooq-codegen -->
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen</artifactId>
+            <version>3.13.6</version>
+        </dependency>
+    </dependencies>
+    
+</project>
