@@ -2,7 +2,7 @@ package niseshin.emplotask;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import static generated.Tables.EMPLOYEE;
+import static generated.Tables.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.ws.rs.*;
@@ -24,7 +24,7 @@ public class EmployeeResource {
     }
 
     @GET
-    public String employees() throws SQLException {
+    public String getEmployees() throws SQLException {
         Result<Record> result;
 
         try (Connection con = ds.getConnection();
@@ -33,5 +33,17 @@ public class EmployeeResource {
         }
 
         return result.formatJSON();
+    }
+
+    @POST
+    @Path("add")
+    public void addEmployee(String content) throws SQLException {
+        String[] args = content.substring(2, content.length() - 2).split("\",\"");
+
+        try (Connection con = ds.getConnection();
+                DSLContext context = DSL.using(con, SQLDialect.POSTGRES);) {
+            int bossId = context.select(EMPLOYEE.ID).from(EMPLOYEE).where(EMPLOYEE.NAME.eq(args[3])).fetchOne().getValue(EMPLOYEE.ID);
+            context.insertInto(EMPLOYEE, EMPLOYEE.NAME, EMPLOYEE.POST, EMPLOYEE.BRANCH, EMPLOYEE.BOSS, EMPLOYEE.BOSS_ID).values(args[0], args[1], args[2], args[3], bossId).returning().fetch();
+        }
     }
 }
