@@ -10,8 +10,8 @@ export const SAVE_EMPLOYEE = 'SAVE_EMPLOYEE';
 export const LOAD_TASKS_LIST = 'LOAD_TASKS_LIST';
 export const SHOW_TASKS_LIST = 'SHOW_TASKS_LIST';
 export const SHOW_TASK = 'SHOW_TASK';
-export const CHANGE_TASK_PRIORITY = 'CHANGE_TASK_PRIORITY';
 export const CHANGE_TASK_DESCRIPTION = 'CHANGE_TASK_DESCRIPTION';
+export const CHANGE_TASK_PRIORITY = 'CHANGE_TASK_PRIORITY';
 export const CHANGE_TASK_PERFORMER = 'CHANGE_TASK_PERFORMER';
 export const SAVE_TASK = 'SAVE_TASK';
 
@@ -62,7 +62,11 @@ export const changeEmployeeBranch = (branch) => {
 }
 
 export const changeEmployeeBoss = (boss) => {
-    if (boss === '-') boss = null;
+    if (boss === '-' || boss === null) {
+        boss = null;
+    } else {
+        boss = parseInt(boss);
+    }
     return {
         type: CHANGE_EMPLOYEE_BOSS,
         payload: boss
@@ -100,9 +104,18 @@ export const showTask = (id) => {
     }
 }
 
+export const changeTaskDescription = (description) => {
+    return {
+        type: CHANGE_TASK_DESCRIPTION,
+        payload: description
+    }
+}
+
 export const changeTaskPriority = (priority, minPriority, maxPriority) => {
     priority = parseInt(priority);
-    if (priority < minPriority || priority <= 0) {
+    if (isNaN(priority)) {
+        priority = null;
+    } else if (priority < minPriority) {
         priority = minPriority;
     } else if (priority > maxPriority) {
         priority = maxPriority;
@@ -110,13 +123,6 @@ export const changeTaskPriority = (priority, minPriority, maxPriority) => {
     return {
         type: CHANGE_TASK_PRIORITY,
         payload: priority
-    }
-}
-
-export const changeTaskDescription = (description) => {
-    return {
-        type: CHANGE_TASK_DESCRIPTION,
-        payload: description
     }
 }
 

@@ -1,21 +1,25 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useStyles } from '../styles';
 import { showEmployee, showEmployeesList, showTasksList } from './store/actions';
 
 export function EmployeesList() {
     const dispatch = useDispatch();
+    const page = useSelector(state => state.page);
+    const classes = useStyles(page);
 
     return (
         <div>
-            <h1>Список сотрудников и задач</h1>
-            <p>
-                <button onClick={() => dispatch(showEmployeesList())}>Сотрудники</button>
-                <button onClick={() => dispatch(showTasksList())}>Задачи</button>
-                <button onClick={() => dispatch(showEmployee(null))}>Добавить сотрудника</button>
-            </p>
+            <h1 className={classes.title}>Список сотрудников и задач</h1>
             <div>
-                <EmployeeTable />
+                <button className={classes.tabButtonEmployees}
+                    onClick={() => dispatch(showEmployeesList())}>Сотрудники</button>
+                <button className={classes.tabButtonTasks}
+                    onClick={() => dispatch(showTasksList())}>Задачи</button>
+                <button className={classes.addButton}
+                    onClick={() => dispatch(showEmployee(null))}>Добавить сотрудника</button>
             </div>
+            <EmployeeTable />
         </div>
     );
 }
@@ -26,8 +30,9 @@ function EmployeeTable() {
     const tasks = useSelector(state => state.tasks);
     const isEmloyeesLoaded = useSelector(state => state.isEmloyeesLoaded);
     const isTasksLoaded = useSelector(state => state.isTasksLoaded);
+    const classes = useStyles();
 
-    // считаем задачи
+    // считаем задачи у сотрудников
     let taskCount = [];
     tasks.forEach((element) => {
         taskCount[element[3]] = taskCount[element[3]] ? ++taskCount[element[3]] : 1;
@@ -35,9 +40,9 @@ function EmployeeTable() {
 
     if (isEmloyeesLoaded && isTasksLoaded) {
         return (
-            <table>
+            <table className={classes.table}>
                 <thead>
-                    <tr>
+                    <tr className={classes.titleRow}>
                         <th>ID</th>
                         <th>Имя</th>
                         <th>Должность</th>

@@ -65,7 +65,7 @@ export function reducer(state = initialState, action) {
         case CHANGE_EMPLOYEE_BOSS:
             return {
                 ...state,
-                employeeBoss: action.payload != null ? parseInt(action.payload) : null
+                employeeBoss: action.payload
             }
         case SAVE_EMPLOYEE:
             return {
@@ -97,15 +97,15 @@ export function reducer(state = initialState, action) {
                 taskDescription: action.payload != null ? state.tasks[action.payload][2] : '',
                 taskPerformer: action.payload != null ? state.tasks[action.payload][3] : null
             }
-        case CHANGE_TASK_PRIORITY:
-            return {
-                ...state,
-                taskPriority: action.payload
-            }
         case CHANGE_TASK_DESCRIPTION:
             return {
                 ...state,
                 taskDescription: action.payload
+            }
+        case CHANGE_TASK_PRIORITY:
+            return {
+                ...state,
+                taskPriority: action.payload
             }
         case CHANGE_TASK_PERFORMER:
             return {
@@ -119,8 +119,6 @@ export function reducer(state = initialState, action) {
                 isTasksLoaded: false
             }
         default:
-            // сначала написал по инерции return { state }   -_-
-            // не надо так делать
             return state
     }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useStyles } from '../styles';
 import { changeEmployeeBoss, changeEmployeeBranch, changeEmployeeName, changeEmployeePost, saveEmployee, showEmployeesList } from './store/actions';
 
 export function Employee() {
@@ -11,28 +12,36 @@ export function Employee() {
     const employeePost = useSelector(state => state.employeePost);
     const employeeBranch = useSelector(state => state.employeeBranch);
     const employeeBoss = useSelector(state => state.employeeBoss);
+    const classes = useStyles();
 
     return (
         <div>
-            <h1>{employeeIndex == null ? 'Добавление сотрудника' : 'Редактирование сотрудника №' + employeeIndex}</h1>
+            <h1 className={classes.title}>{employeeIndex == null ? 'Добавление сотрудника' : 'Редактирование сотрудника №' + employeeIndex}</h1>
             <div>
-                <label>ФИО</label>
-                <input defaultValue={employeeName}
+                <label className={classes.label}>ФИО</label>
+                <input className={classes.input}
+                    defaultValue={employeeName}
                     onChange={(event) => dispatch(changeEmployeeName(event.target.value))}></input>
+                {!employeeName ? <label className={classes.labelWarning}>{'<'}</label> : null}
             </div>
             <div>
-                <label>Должность</label>
-                <input defaultValue={employeePost}
+                <label className={classes.label}>Должность</label>
+                <input className={classes.input}
+                    defaultValue={employeePost}
                     onChange={(event) => dispatch(changeEmployeePost(event.target.value))}></input>
+                {!employeePost ? <label className={classes.labelWarning}>{'<'}</label> : null}
             </div>
             <div>
-                <label>Филиал</label>
-                <input defaultValue={employeeBranch}
+                <label className={classes.label}>Филиал</label>
+                <input className={classes.input}
+                    defaultValue={employeeBranch}
                     onChange={(event) => dispatch(changeEmployeeBranch(event.target.value))}></input>
+                {!employeeBranch ? <label className={classes.labelWarning}>{'<'}</label> : null}
             </div>
             <div>
-                <label>Руководитель</label>
-                <select defaultValue={employeeBoss != null ? employees[employeeBoss][0] : ''}
+                <label className={classes.label}>Руководитель</label>
+                <select className={classes.select}
+                    defaultValue={employeeBoss != null ? employees[employeeBoss][0] : ''}
                     onChange={(event) => dispatch(changeEmployeeBoss(event.target.value))}>
                     <option value={'-'}></option>
                     {employees.map((value, index) => (
@@ -41,53 +50,58 @@ export function Employee() {
                 </select>
             </div>
             <div>
-                <button onClick={() => deleteE()}>Удалить</button>
-                <button onClick={() => saveE()}>Сохранить</button>
-                <button onClick={() => dispatch(showEmployeesList())}>Отмена</button>
+                <button className={classes.deleteButton}
+                    disabled={employeeIndex == null ? true : false}
+                    onClick={() => deleteE()}>Удалить</button>
+                <button className={classes.saveButton}
+                    disabled={!employeeName || !employeePost || !employeeBranch ? true : false}
+                    onClick={() => saveE()}>Сохранить</button>
+                <button className={classes.cancelButton}
+                    onClick={() => dispatch(showEmployeesList())}>Отмена</button>
             </div>
         </div>
     );
 
     function saveE() {
-        if (!employeeName) {
-            alert('Заполните имя');
-        } else if (!employeePost) {
-            alert('Заполните должность');
-        } else if (!employeeBranch) {
-            alert('Заполните филиал');
+        // if (!employeeName) {
+        //     alert('Заполните имя');
+        // } else if (!employeePost) {
+        //     alert('Заполните должность');
+        // } else if (!employeeBranch) {
+        //     alert('Заполните филиал');
+        // } else {
+        if (employeeIndex == null) {
+            new Promise((resolve, reject) => {
+                const request = new XMLHttpRequest();
+                request.open('POST', 'http://localhost:8080/emplotask/resources/employees/add');
+                request.onload = () => {
+                    if (request.status === 204) {
+                        resolve(request.response);
+                    } else {
+                        reject(Error(request.statusText));
+                    }
+                };
+                request.send(JSON.stringify([employeeName, employeePost, employeeBranch, employeeBoss != null ? employeeBoss.toString() : 'null']));
+            }).then(() => {
+                dispatch(saveEmployee());
+            });
         } else {
-            if (employeeIndex == null) {
-                new Promise((resolve, reject) => {
-                    const request = new XMLHttpRequest();
-                    request.open('POST', 'http://localhost:8080/emplotask/resources/employees/add');
-                    request.onload = () => {
-                        if (request.status === 204) {
-                            resolve(request.response);
-                        } else {
-                            reject(Error(request.statusText));
-                        }
-                    };
-                    request.send(JSON.stringify([employeeName, employeePost, employeeBranch, employeeBoss != null ? employeeBoss.toString() : 'null']));
-                }).then(() => {
-                    dispatch(saveEmployee());
-                });
-            } else {
-                new Promise((resolve, reject) => {
-                    const request = new XMLHttpRequest();
-                    request.open('POST', 'http://localhost:8080/emplotask/resources/employees/update');
-                    request.onload = () => {
-                        if (request.status === 204) {
-                            resolve(request.response);
-                        } else {
-                            reject(Error(request.statusText));
-                        }
-                    };
-                    request.send(JSON.stringify([employeeName, employeePost, employeeBranch, employeeBoss != null ? employeeBoss.toString() : 'null', employeeIndex.toString()]));
-                }).then(() => {
-                    dispatch(saveEmployee());
-                });
-            }
+            new Promise((resolve, reject) => {
+                const request = new XMLHttpRequest();
+                request.open('POST', 'http://localhost:8080/emplotask/resources/employees/update');
+                request.onload = () => {
+                    if (request.status === 204) {
+                        resolve(request.response);
+                    } else {
+                        reject(Error(request.statusText));
+                    }
+                };
+                request.send(JSON.stringify([employeeName, employeePost, employeeBranch, employeeBoss != null ? employeeBoss.toString() : 'null', employeeIndex.toString()]));
+            }).then(() => {
+                dispatch(saveEmployee());
+            });
         }
+        // }
     }
 
     function deleteE() {
