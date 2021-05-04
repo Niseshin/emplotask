@@ -1,17 +1,17 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStyles } from '../styles';
-import { changeEmployeeBoss, changeEmployeeBranch, changeEmployeeName, changeEmployeePost, saveEmployee, showEmployeesList } from './store/actions';
+import { changeEmployeeBoss, changeEmployeeBranch, changeEmployeeName, changeEmployeePost, saveEmployee, showEmployeeDeleteImpossible, showEmployeesList } from './store/actions';
 
 export function Employee() {
     const dispatch = useDispatch();
     const employees = useSelector(state => state.employees);
-    const tasks = useSelector(state => state.tasks);
     const employeeIndex = useSelector(state => state.employeeIndex);
     const employeeName = useSelector(state => state.employeeName);
     const employeePost = useSelector(state => state.employeePost);
     const employeeBranch = useSelector(state => state.employeeBranch);
     const employeeBoss = useSelector(state => state.employeeBoss);
+    const isEmployeeDeleteImpossible = useSelector(state => state.isEmployeeDeleteImpossible);
     const classes = useStyles();
 
     return (
@@ -59,21 +59,16 @@ export function Employee() {
                 <button className={classes.cancelButton}
                     onClick={() => dispatch(showEmployeesList())}>Отмена</button>
             </div>
+            {isEmployeeDeleteImpossible ? <label className={classes.labelWarning}>{'Удаление невозможно'}</label> : null}
         </div>
     );
 
     function saveE() {
-        // if (!employeeName) {
-        //     alert('Заполните имя');
-        // } else if (!employeePost) {
-        //     alert('Заполните должность');
-        // } else if (!employeeBranch) {
-        //     alert('Заполните филиал');
-        // } else {
         if (employeeIndex == null) {
             new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('POST', 'http://localhost:8080/emplotask/resources/employees/add');
+                request.setRequestHeader("Content-Type", "application/json");
                 request.onload = () => {
                     if (request.status === 204) {
                         resolve(request.response);
@@ -81,7 +76,7 @@ export function Employee() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify([employeeName, employeePost, employeeBranch, employeeBoss != null ? employeeBoss.toString() : 'null']));
+                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "boss": employeeBoss }));
             }).then(() => {
                 dispatch(saveEmployee());
             });
@@ -89,6 +84,7 @@ export function Employee() {
             new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('POST', 'http://localhost:8080/emplotask/resources/employees/update');
+                request.setRequestHeader("Content-Type", "application/json");
                 request.onload = () => {
                     if (request.status === 204) {
                         resolve(request.response);
@@ -96,48 +92,36 @@ export function Employee() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify([employeeName, employeePost, employeeBranch, employeeBoss != null ? employeeBoss.toString() : 'null', employeeIndex.toString()]));
+                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "boss": employeeBoss }));
             }).then(() => {
                 dispatch(saveEmployee());
             });
         }
-        // }
     }
 
     function deleteE() {
         if (employeeIndex != null) {
-            let isBoss = false;
-            let isPerformer = false;
-            employees.forEach((e) => {
-                if (e[4] === employeeIndex) {
-                    isBoss = true;
-                }
-            });
-            tasks.forEach((t) => {
-                if (t[3] === employeeIndex) {
-                    isPerformer = true;
-                }
-            });
-            if (isBoss) {
-                alert('Разберитесь с подчиненными');
-            } else if (isPerformer) {
-                alert('Закончите задачи');
-            } else {
-                new Promise((resolve, reject) => {
-                    const request = new XMLHttpRequest();
-                    request.open('POST', 'http://localhost:8080/emplotask/resources/employees/delete');
-                    request.onload = () => {
-                        if (request.status === 204) {
-                            resolve(request.response);
-                        } else {
-                            reject(Error(request.statusText));
-                        }
-                    };
-                    request.send(employeeIndex);
-                }).then(() => {
+            new Promise((resolve, reject) => {
+                const request = new XMLHttpRequest();
+                request.open('POST', 'http://localhost:8080/emplotask/resources/employees/delete');
+                request.setRequestHeader("Content-Type", "application/json");
+                request.onload = () => {
+                    if (request.status === 204) {
+                        resolve(204);
+                    } else if (request.status === 400) {
+                        resolve(400);
+                    } else {
+                        reject(Error(request.statusText));
+                    }
+                };
+                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "boss": employeeBoss }));
+            }).then((response) => {
+                if (response === 204) {
                     dispatch(saveEmployee());
-                });
-            }
+                } else {
+                    dispatch(showEmployeeDeleteImpossible());
+                }
+            });
         }
     }
 }

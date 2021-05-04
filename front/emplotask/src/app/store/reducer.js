@@ -1,21 +1,24 @@
-import { CHANGE_EMPLOYEE_BOSS, CHANGE_EMPLOYEE_BRANCH, CHANGE_EMPLOYEE_NAME, CHANGE_EMPLOYEE_POST, CHANGE_TASK_DESCRIPTION, CHANGE_TASK_PERFORMER, CHANGE_TASK_PRIORITY, LOAD_EMPLOYEES_LIST, LOAD_TASKS_LIST, SAVE_EMPLOYEE, SAVE_TASK, SHOW_EMPLOYEE, SHOW_EMPLOYEES_LIST, SHOW_TASK, SHOW_TASKS_LIST } from "./actions"
+import { CHANGE_EMPLOYEE_BOSS, CHANGE_EMPLOYEE_BRANCH, CHANGE_EMPLOYEE_NAME, CHANGE_EMPLOYEE_POST, CHANGE_TASK_DESCRIPTION, CHANGE_TASK_PERFORMER, CHANGE_TASK_PRIORITY, LOAD_EMPLOYEES_LIST, LOAD_TASKS_LIST, SAVE_EMPLOYEE, SAVE_TASK, SHOW_EMPLOYEE, SHOW_EMPLOYEES_LIST, SHOW_EMPLOYEE_DELETE_IMPOSSIBLE, SHOW_TASK, SHOW_TASKS_LIST } from "./actions"
 
 // вроде как создатели Реакта рекомендуют хранить в состоянии как можно меньше данных,
 // но как без массивов сотрудников и задач тут обойтись не придумал
 const initialState = {
     employees: [],
-    tasks: [],
     isEmloyeesLoaded: false,
-    isTasksLoaded: false,
+    isEmployeeDeleteImpossible: false,
     employeeIndex: null,
     employeeName: '',
     employeePost: '',
     employeeBranch: '',
     employeeBoss: null,
+
+    tasks: [],
+    isTasksLoaded: false,
     taskIndex: null,
     taskPriority: null,
     taskDescription: '',
     taskPerformer: null,
+
     page: 'employeesList'
 }
 
@@ -30,22 +33,23 @@ export function reducer(state = initialState, action) {
         case SHOW_EMPLOYEES_LIST:
             return {
                 ...state,
-                page: 'employeesList',
                 employeeIndex: null,
                 employeeName: '',
                 employeePost: '',
                 employeeBranch: '',
-                employeeBoss: null
+                employeeBoss: null,
+                isEmployeeDeleteImpossible: false,
+                page: 'employeesList'
             }
         case SHOW_EMPLOYEE:
             return {
                 ...state,
-                page: 'employee',
                 employeeIndex: action.payload,
                 employeeName: action.payload != null ? state.employees[action.payload][1] : '',
                 employeePost: action.payload != null ? state.employees[action.payload][2] : '',
                 employeeBranch: action.payload != null ? state.employees[action.payload][3] : '',
-                employeeBoss: action.payload != null ? state.employees[action.payload][4] : null
+                employeeBoss: action.payload != null ? state.employees[action.payload][4] : null,
+                page: 'employee'
             }
         case CHANGE_EMPLOYEE_NAME:
             return {
@@ -70,8 +74,14 @@ export function reducer(state = initialState, action) {
         case SAVE_EMPLOYEE:
             return {
                 ...state,
-                page: 'employeesList',
-                isEmloyeesLoaded: false
+                isEmloyeesLoaded: false,
+                isEmployeeDeleteImpossible: false,
+                page: 'employeesList'
+            }
+        case SHOW_EMPLOYEE_DELETE_IMPOSSIBLE:
+            return {
+                ...state,
+                isEmployeeDeleteImpossible: true
             }
         case LOAD_TASKS_LIST:
             return {

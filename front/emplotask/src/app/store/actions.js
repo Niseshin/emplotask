@@ -6,6 +6,7 @@ export const CHANGE_EMPLOYEE_POST = 'CHANGE_EMPLOYEE_POST';
 export const CHANGE_EMPLOYEE_BRANCH = 'CHANGE_EMPLOYEE_BRANCH';
 export const CHANGE_EMPLOYEE_BOSS = 'CHANGE_EMPLOYEE_BOSS';
 export const SAVE_EMPLOYEE = 'SAVE_EMPLOYEE';
+export const SHOW_EMPLOYEE_DELETE_IMPOSSIBLE = 'SHOW_EMPLOYEE_DELETE_IMPOSSIBLE';
 
 export const LOAD_TASKS_LIST = 'LOAD_TASKS_LIST';
 export const SHOW_TASKS_LIST = 'SHOW_TASKS_LIST';
@@ -76,6 +77,12 @@ export const changeEmployeeBoss = (boss) => {
 export const saveEmployee = () => {
     return {
         type: SAVE_EMPLOYEE
+    }
+}
+
+export const showEmployeeDeleteImpossible = () => {
+    return {
+        type: SHOW_EMPLOYEE_DELETE_IMPOSSIBLE
     }
 }
 

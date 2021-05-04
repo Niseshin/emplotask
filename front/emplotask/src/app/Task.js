@@ -73,17 +73,11 @@ export function Task() {
     );
 
     function saveT() {
-        // if (!taskDescription) {
-        //     alert('Заполните описание');
-        // } else if (!taskPriority) {
-        //     alert('Установите приоритет');
-        // } else if (!taskPerformer) {
-        //     alert('Выберете исполнителя');
-        // } else {
         if (taskIndex == null) {
             new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('POST', 'http://localhost:8080/emplotask/resources/tasks/add');
+                request.setRequestHeader("Content-Type", "application/json");
                 request.onload = () => {
                     if (request.status === 204) {
                         resolve(request.response);
@@ -91,7 +85,7 @@ export function Task() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify([taskPriority.toString(), taskDescription, taskPerformer.toString()]));
+                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performer": taskPerformer }));
             }).then(() => {
                 dispatch(saveTask());
             });
@@ -99,6 +93,7 @@ export function Task() {
             new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('POST', 'http://localhost:8080/emplotask/resources/tasks/update');
+                request.setRequestHeader("Content-Type", "application/json");
                 request.onload = () => {
                     if (request.status === 204) {
                         resolve(request.response);
@@ -106,12 +101,11 @@ export function Task() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify([taskPriority.toString(), taskDescription, taskPerformer.toString(), taskIndex.toString()]));
+                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performer": taskPerformer }));
             }).then(() => {
                 dispatch(saveTask());
             });
         }
-        // }
     }
 
     function deleteT() {
@@ -119,6 +113,7 @@ export function Task() {
             new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('POST', 'http://localhost:8080/emplotask/resources/tasks/delete');
+                request.setRequestHeader("Content-Type", "application/json");
                 request.onload = () => {
                     if (request.status === 204) {
                         resolve(request.response);
@@ -126,7 +121,7 @@ export function Task() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(taskIndex);
+                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performer": taskPerformer }));
             }).then(() => {
                 dispatch(saveTask());
             });

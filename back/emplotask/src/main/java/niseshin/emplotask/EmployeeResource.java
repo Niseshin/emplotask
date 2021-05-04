@@ -1,81 +1,37 @@
 package niseshin.emplotask;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import static generated.Tables.*;
-import java.sql.Connection;
-import java.sql.SQLException;
 import javax.ws.rs.*;
-import org.jooq.DSLContext;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("employees")
 public class EmployeeResource {
 
-    private static HikariConfig config;
-    private static HikariDataSource ds;
-
-    static {
-        config = new HikariConfig(EmployeeResource.class.getResource("hikari.properties").getPath());
-        ds = new HikariDataSource(config);
-    }
+    private final EmployeeService employeeService = new EmployeeService();
 
     @GET
-    public String getEmployees() throws SQLException {
-        Result result;
-
-        try (Connection con = ds.getConnection();
-                DSLContext context = DSL.using(con, SQLDialect.POSTGRES);) {
-            result = context.select()
-                    .from(EMPLOYEE)
-                    .fetch();
-        }
-
-        return result.formatJSON();
+    public Response getEmployees() {
+        return employeeService.getEmployees();
     }
 
     @POST
     @Path("add")
-    public void addEmployee(String content) throws SQLException {
-        String[] args = content.substring(2, content.length() - 2).split("\",\"");
-
-        try (Connection con = ds.getConnection();
-                DSLContext context = DSL.using(con, SQLDialect.POSTGRES);) {
-            context.insertInto(EMPLOYEE, EMPLOYEE.NAME, EMPLOYEE.POST, EMPLOYEE.BRANCH, EMPLOYEE.BOSS_ID)
-                    .values(args[0], args[1], args[2], args[3].equals("null") ? null : Integer.parseInt(args[3]))
-                    .returning()
-                    .fetch();
-        }
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void addEmployee(Employee employee) {
+        employeeService.addEmployee(employee);
     }
 
     @POST
     @Path("update")
-    public void updateEmployee(String content) throws SQLException {
-        String[] args = content.substring(2, content.length() - 2).split("\",\"");
-
-        try (Connection con = ds.getConnection();
-                DSLContext context = DSL.using(con, SQLDialect.POSTGRES);) {
-            context.update(EMPLOYEE)
-                    .set(EMPLOYEE.NAME, args[0])
-                    .set(EMPLOYEE.POST, args[1])
-                    .set(EMPLOYEE.BRANCH, args[2])
-                    .set(EMPLOYEE.BOSS_ID, args[3].equals("null") ? null : Integer.parseInt(args[3]))
-                    .where(EMPLOYEE.ID.eq(Integer.parseInt(args[4])))
-                    .execute();
-        }
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateEmployee(Employee employee) {
+        employeeService.updateEmployee(employee);
     }
 
     @POST
     @Path("delete")
-    public void deleteEmployee(String content) throws SQLException {
-
-        try (Connection con = ds.getConnection();
-                DSLContext context = DSL.using(con, SQLDialect.POSTGRES);) {
-            context.delete(EMPLOYEE)
-                    .where(EMPLOYEE.ID.eq(Integer.parseInt(content)))
-                    .execute();
-        }
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteEmployee(Employee employee) {
+        return employeeService.deleteEmployee(employee);
     }
 }

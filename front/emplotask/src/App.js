@@ -33,7 +33,7 @@ export function App() {
         });
     }
 
-    if (!isTasksLoaded) {
+    if (isEmloyeesLoaded && !isTasksLoaded) {
         new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();
             request.open('GET', 'http://localhost:8080/emplotask/resources/tasks');
