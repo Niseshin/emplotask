@@ -76,7 +76,7 @@ export function Employee() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "boss": employeeBoss }));
+                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "bossId": employeeBoss }));
             }).then(() => {
                 dispatch(saveEmployee());
             });
@@ -92,7 +92,7 @@ export function Employee() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "boss": employeeBoss }));
+                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "bossId": employeeBoss }));
             }).then(() => {
                 dispatch(saveEmployee());
             });
@@ -114,7 +114,7 @@ export function Employee() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "boss": employeeBoss }));
+                request.send(JSON.stringify({ "id": employeeIndex, "name": employeeName, "post": employeePost, "branch": employeeBranch, "bossId": employeeBoss }));
             }).then((response) => {
                 if (response === 204) {
                     dispatch(saveEmployee());

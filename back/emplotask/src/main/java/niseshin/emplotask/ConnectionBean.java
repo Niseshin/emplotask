@@ -2,19 +2,19 @@ package niseshin.emplotask;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-//import javax.ejb.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
-//@Singleton
+@ApplicationScoped
 public class ConnectionBean {
 
-    private static final HikariConfig config = new HikariConfig(EmployeeResource.class.getResource("hikari.properties").getPath());
-    private static final HikariDataSource ds = new HikariDataSource(config);
-    private static final DSLContext context = DSL.using(ds, SQLDialect.POSTGRES);
+    private final HikariConfig config = new HikariConfig(EmployeeResource.class.getResource("hikari.properties").getPath());
+    private final HikariDataSource ds = new HikariDataSource(config);
+    private final DSLContext context = DSL.using(ds, SQLDialect.POSTGRES);
 
-    public static DSLContext getDSLContext() {
+    public DSLContext getDSLContext() {
         return context;
     }
 }

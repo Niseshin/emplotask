@@ -85,7 +85,7 @@ export function Task() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performer": taskPerformer }));
+                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performerId": taskPerformer }));
             }).then(() => {
                 dispatch(saveTask());
             });
@@ -101,7 +101,7 @@ export function Task() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performer": taskPerformer }));
+                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performerId": taskPerformer }));
             }).then(() => {
                 dispatch(saveTask());
             });
@@ -121,7 +121,7 @@ export function Task() {
                         reject(Error(request.statusText));
                     }
                 };
-                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performer": taskPerformer }));
+                request.send(JSON.stringify({ "id": taskIndex, "priority": taskPriority, "description": taskDescription, "performerId": taskPerformer }));
             }).then(() => {
                 dispatch(saveTask());
             });

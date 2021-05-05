@@ -1,16 +1,21 @@
 package niseshin.emplotask;
 
 import static generated.Tables.*;
+import generated.tables.records.TaskRecord;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-import org.jooq.DSLContext;
 import org.jooq.Result;
 
+@ApplicationScoped
 public class TaskService {
 
-    private static final DSLContext context = ConnectionBean.getDSLContext();
+    @Inject
+    private ConnectionBean conBean;
 
     public Response getTasks() {
-        Result result = context.select(TASK.ID, TASK.PRIORITY, TASK.DESCRIPTION, TASK.PERFORMER_ID, EMPLOYEE.NAME)
+        Result result = conBean.getDSLContext()
+                .select(TASK.ID, TASK.PRIORITY, TASK.DESCRIPTION, TASK.PERFORMER_ID, EMPLOYEE.NAME)
                 .from(TASK.join(EMPLOYEE).on(EMPLOYEE.ID.eq(TASK.PERFORMER_ID)))
                 .fetch();
         Response response = Response
@@ -21,25 +26,63 @@ public class TaskService {
         return response;
     }
 
-    public void addTask(Task task) {
-        context.insertInto(TASK, TASK.PRIORITY, TASK.DESCRIPTION, TASK.PERFORMER_ID)
-                .values(task.priority, task.description, task.performer)
-                .returning()
-                .fetch();
+    public Response addTask(TaskRecord task) {
+        if (task.getPriority() != null
+                && task.getDescription() != null
+                && task.getPerformerId() != null) {
+            conBean.getDSLContext()
+                    .insertInto(TASK, TASK.PRIORITY, TASK.DESCRIPTION, TASK.PERFORMER_ID)
+                    .values(task.getPriority(), task.getDescription(), task.getPerformerId())
+                    .returning()
+                    .fetch();
+
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .build();
+        }
+
+        return Response
+                .status(Response.Status.BAD_REQUEST)
+                .build();
     }
 
-    public void updateTask(Task task) {
-        context.update(TASK)
-                .set(TASK.PRIORITY, task.priority)
-                .set(TASK.DESCRIPTION, task.description)
-                .set(TASK.PERFORMER_ID, task.performer)
-                .where(TASK.ID.eq(task.id))
-                .execute();
+    public Response updateTask(TaskRecord task) {
+        if (task.getId() != null
+                && task.getPriority() != null
+                && task.getDescription() != null
+                && task.getPerformerId() != null) {
+            conBean.getDSLContext()
+                    .update(TASK)
+                    .set(TASK.PRIORITY, task.getPriority())
+                    .set(TASK.DESCRIPTION, task.getDescription())
+                    .set(TASK.PERFORMER_ID, task.getPerformerId())
+                    .where(TASK.ID.eq(task.getId()))
+                    .execute();
+
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .build();
+        }
+
+        return Response
+                .status(Response.Status.BAD_REQUEST)
+                .build();
     }
 
-    public void deleteTask(Task task) {
-        context.delete(TASK)
-                .where(TASK.ID.eq(task.id))
-                .execute();
+    public Response deleteTask(TaskRecord task) {
+        if (task.getId() != null) {
+            conBean.getDSLContext()
+                    .delete(TASK)
+                    .where(TASK.ID.eq(task.getId()))
+                    .execute();
+
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .build();
+        }
+
+        return Response
+                .status(Response.Status.BAD_REQUEST)
+                .build();
     }
 }

@@ -1,13 +1,18 @@
 package niseshin.emplotask;
 
+import generated.tables.records.TaskRecord;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("tasks")
+@ApplicationScoped
 public class TaskResource {
 
-    private final TaskService taskService = new TaskService();
+    @Inject
+    private TaskService taskService;
 
     @GET
     public Response getTasks() {
@@ -17,21 +22,21 @@ public class TaskResource {
     @POST
     @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void addTask(Task task) {
-        taskService.addTask(task);
+    public Response addTask(TaskRecord task) {
+        return taskService.addTask(task);
     }
 
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateTask(Task task) {
-        taskService.updateTask(task);
+    public Response updateTask(TaskRecord task) {
+        return taskService.updateTask(task);
     }
 
     @POST
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void deleteTask(Task task) {
-        taskService.deleteTask(task);
+    public Response deleteTask(TaskRecord task) {
+        return taskService.deleteTask(task);
     }
 }

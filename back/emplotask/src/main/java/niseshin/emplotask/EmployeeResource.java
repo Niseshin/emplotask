@@ -1,13 +1,18 @@
 package niseshin.emplotask;
 
+import generated.tables.records.EmployeeRecord;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("employees")
+@ApplicationScoped
 public class EmployeeResource {
 
-    private final EmployeeService employeeService = new EmployeeService();
+    @Inject
+    private EmployeeService employeeService;
 
     @GET
     public Response getEmployees() {
@@ -17,21 +22,21 @@ public class EmployeeResource {
     @POST
     @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void addEmployee(Employee employee) {
-        employeeService.addEmployee(employee);
+    public Response addEmployee(EmployeeRecord employee) {
+        return employeeService.addEmployee(employee);
     }
 
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateEmployee(Employee employee) {
-        employeeService.updateEmployee(employee);
+    public Response updateEmployee(EmployeeRecord employee) {
+        return employeeService.updateEmployee(employee);
     }
 
     @POST
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEmployee(Employee employee) {
+    public Response deleteEmployee(EmployeeRecord employee) {
         return employeeService.deleteEmployee(employee);
     }
 }
