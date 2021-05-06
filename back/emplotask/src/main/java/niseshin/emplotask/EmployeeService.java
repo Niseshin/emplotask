@@ -5,16 +5,17 @@ import generated.tables.records.EmployeeRecord;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
+import org.jooq.DSLContext;
 import org.jooq.Result;
 
 @ApplicationScoped
 public class EmployeeService {
 
     @Inject
-    private ConnectionBean conBean;
+    private DSLContext context;
 
     public Response getEmployees() {
-        Result result = conBean.getDSLContext()
+        Result result = context
                 .select()
                 .from(EMPLOYEE)
                 .fetch();
@@ -27,17 +28,20 @@ public class EmployeeService {
     }
 
     public Response addEmployee(EmployeeRecord employee) {
-        if (employee.getName() != null
+        if (employee.getId() == null
+                && employee.getName() != null
+                && !employee.getName().isEmpty()
                 && employee.getPost() != null
-                && employee.getBranch() != null) {
+                && !employee.getPost().isEmpty()
+                && employee.getBranch() != null
+                && !employee.getBranch().isEmpty()) {
 //            context.insertInto(EMPLOYEE, EMPLOYEE.NAME, EMPLOYEE.POST, EMPLOYEE.BRANCH, EMPLOYEE.BOSS_ID)
 //                    .values(employee.getName(), employee.getPost(), employee.getBranch(), employee.getBossId())
 //                    .returning()
 //                    .fetch();
 
-            // обнаружил еще такой вариант, работает, но прежняя версия мне больше нравится
-            employee.attach(conBean.getDSLContext().configuration());
             employee.reset("id");
+            employee.attach(context.configuration());
             employee.insert();
 
             return Response
@@ -52,9 +56,13 @@ public class EmployeeService {
 
     public Response updateEmployee(EmployeeRecord employee) {
         if (employee.getId() != null
+                && context.select().from(EMPLOYEE).where(EMPLOYEE.ID.eq(employee.getId())).fetchOne() != null
                 && employee.getName() != null
+                && !employee.getName().isEmpty()
                 && employee.getPost() != null
-                && employee.getBranch() != null) {
+                && !employee.getPost().isEmpty()
+                && employee.getBranch() != null
+                && !employee.getBranch().isEmpty()) {
 //            context.update(EMPLOYEE)
 //                    .set(EMPLOYEE.NAME, employee.getName())
 //                    .set(EMPLOYEE.POST, employee.getPost())
@@ -63,8 +71,7 @@ public class EmployeeService {
 //                    .where(EMPLOYEE.ID.eq(employee.getId()))
 //                    .execute();
 
-            // а может быть новая версия не так уж плоха :)
-            employee.attach(conBean.getDSLContext().configuration());
+            employee.attach(context.configuration());
             employee.update();
 
             return Response
@@ -79,14 +86,14 @@ public class EmployeeService {
 
     public Response deleteEmployee(EmployeeRecord employee) {
         if (employee.getId() != null
-                && conBean.getDSLContext().select().from(EMPLOYEE).where(EMPLOYEE.BOSS_ID.eq(employee.getId())).fetch().isEmpty()
-                && conBean.getDSLContext().select().from(TASK).where(TASK.PERFORMER_ID.eq(employee.getId())).fetch().isEmpty()) {
+                && context.select().from(EMPLOYEE).where(EMPLOYEE.ID.eq(employee.getId())).fetchOne() != null
+                && context.select().from(EMPLOYEE).where(EMPLOYEE.BOSS_ID.eq(employee.getId())).fetch().isEmpty()
+                && context.select().from(TASK).where(TASK.PERFORMER_ID.eq(employee.getId())).fetch().isEmpty()) {
 //            context.delete(EMPLOYEE)
 //                    .where(EMPLOYEE.ID.eq(employee.getId()))
 //                    .execute();
 
-            // надо найти способ приклеивать конфигурацию автоматически (инъекции?)
-            employee.attach(conBean.getDSLContext().configuration());
+            employee.attach(context.configuration());
             employee.delete();
 
             return Response
