@@ -1,6 +1,6 @@
 package niseshin.emplotask;
 
-import generated.tables.records.EmployeeRecord;
+import generated.tables.pojos.Employee;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -19,24 +19,31 @@ public class EmployeeResource {
         return employeeService.getEmployees();
     }
 
+    @GET
+    @Path("get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEmployeesThroughDao() {
+        return employeeService.getEmployeesThroughDao();
+    }
+
     @POST
     @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addEmployee(EmployeeRecord employee) {
+    public Response addEmployee(Employee employee) {
         return employeeService.addEmployee(employee);
     }
 
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateEmployee(EmployeeRecord employee) {
+    public Response updateEmployee(Employee employee) {
         return employeeService.updateEmployee(employee);
     }
 
     @POST
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEmployee(EmployeeRecord employee) {
+    public Response deleteEmployee(Employee employee) {
         return employeeService.deleteEmployee(employee);
     }
 }
