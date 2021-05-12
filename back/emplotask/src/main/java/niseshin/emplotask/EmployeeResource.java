@@ -15,15 +15,40 @@ public class EmployeeResource {
     private EmployeeService employeeService;
 
     @GET
-    public Response getEmployees() {
-        return employeeService.getEmployees();
+    public Response getEmployeesOld() {
+        return employeeService.getEmployeesOld();
     }
 
     @GET
-    @Path("get")
+    @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeesThroughDao() {
-        return employeeService.getEmployeesThroughDao();
+    public Response getEmployees(
+            @DefaultValue("100") @QueryParam("lim") int limit,
+            @DefaultValue("0") @QueryParam("off") int offset) {
+        return employeeService.getEmployees(limit, offset);
+    }
+
+    @GET
+    @Path("getname/{id: [0-9]+}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getName(@PathParam("id") int id) {
+        return employeeService.getName(id);
+    }
+
+    @GET
+    @Path("gettaskcount/{id: [0-9]+}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTaskCount(@PathParam("id") int id) {
+        return employeeService.getTaskCount(id);
+    }
+
+    @GET
+    @Path("listex")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEmployeesExtended(
+            @DefaultValue("100") @QueryParam("lim") int limit,
+            @DefaultValue("0") @QueryParam("off") int offset) {
+        return employeeService.getEmployeesExtended(limit, offset);
     }
 
     @POST
