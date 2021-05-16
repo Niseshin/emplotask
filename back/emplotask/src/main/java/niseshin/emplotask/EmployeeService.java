@@ -9,7 +9,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 import static org.jooq.impl.DSL.count;
 
 @ApplicationScoped
@@ -22,23 +21,7 @@ public class EmployeeService {
     @Inject
     private TaskDao taskDao;
 
-    public Response getEmployeesOld() {
-
-        Result result = context
-                .select()
-                .from(EMPLOYEE)
-                .fetch();
-
-        Response response = Response
-                .status(Response.Status.OK)
-                .entity(result.formatJSON())
-                .build();
-
-        return response;
-    }
-
     public Response getEmployees(int limit, int offset) {
-
         List<Employee> result = context
                 .select()
                 .from(EMPLOYEE)
@@ -56,7 +39,6 @@ public class EmployeeService {
     }
 
     public Response getName(int id) {
-
         Employee result = context
                 .select(EMPLOYEE.ID, EMPLOYEE.NAME)
                 .from(EMPLOYEE)
@@ -72,7 +54,6 @@ public class EmployeeService {
     }
 
     public Response getTaskCount(int id) {
-
         EmployeeExtended result = context
                 .select(EMPLOYEE.ID, count(TASK.ID))
                 .from(EMPLOYEE)
@@ -123,14 +104,6 @@ public class EmployeeService {
                 && !employee.getPost().isEmpty()
                 && employee.getBranch() != null
                 && !employee.getBranch().isEmpty()) {
-//            context.insertInto(EMPLOYEE, EMPLOYEE.NAME, EMPLOYEE.POST, EMPLOYEE.BRANCH, EMPLOYEE.BOSS_ID)
-//                    .values(employee.getName(), employee.getPost(), employee.getBranch(), employee.getBossId())
-//                    .returning()
-//                    .fetch();
-//
-//            employee.reset("id");
-//            employee.attach(context.configuration());
-//            employee.insert();
 
             employeeDao.insert(employee);
 
@@ -146,7 +119,6 @@ public class EmployeeService {
 
     public Response updateEmployee(Employee employee) {
         if (employee.getId() != null
-                // && context.select().from(EMPLOYEE).where(EMPLOYEE.ID.eq(employee.getId())).fetchOne() != null
                 && employeeDao.existsById(employee.getId())
                 && employee.getName() != null
                 && !employee.getName().isEmpty()
@@ -154,16 +126,6 @@ public class EmployeeService {
                 && !employee.getPost().isEmpty()
                 && employee.getBranch() != null
                 && !employee.getBranch().isEmpty()) {
-//            context.update(EMPLOYEE)
-//                    .set(EMPLOYEE.NAME, employee.getName())
-//                    .set(EMPLOYEE.POST, employee.getPost())
-//                    .set(EMPLOYEE.BRANCH, employee.getBranch())
-//                    .set(EMPLOYEE.BOSS_ID, employee.getBossId())
-//                    .where(EMPLOYEE.ID.eq(employee.getId()))
-//                    .execute();
-//
-//            employee.attach(context.configuration());
-//            employee.update();
 
             employeeDao.update(employee);
 
@@ -177,20 +139,40 @@ public class EmployeeService {
                 .build();
     }
 
+    public Response saveEmployee(Employee employee) {
+        if (employee.getName() != null
+                && !employee.getName().isEmpty()
+                && employee.getPost() != null
+                && !employee.getPost().isEmpty()
+                && employee.getBranch() != null
+                && !employee.getBranch().isEmpty()) {
+
+            if (employee.getId() == null) {
+                employeeDao.insert(employee);
+
+                return Response
+                        .status(Response.Status.NO_CONTENT)
+                        .build();
+
+            } else if (employeeDao.existsById(employee.getId())) {
+                employeeDao.update(employee);
+
+                return Response
+                        .status(Response.Status.NO_CONTENT)
+                        .build();
+            }
+        }
+
+        return Response
+                .status(Response.Status.BAD_REQUEST)
+                .build();
+    }
+
     public Response deleteEmployee(Employee employee) {
         if (employee.getId() != null
-                // && context.select().from(EMPLOYEE).where(EMPLOYEE.ID.eq(employee.getId())).fetchOne() != null
                 && employeeDao.existsById(employee.getId())
-                // && context.select().from(EMPLOYEE).where(EMPLOYEE.BOSS_ID.eq(employee.getId())).fetch().isEmpty()
                 && employeeDao.fetchByBossId(employee.getId()).isEmpty()
-                // && context.select().from(TASK).where(TASK.PERFORMER_ID.eq(employee.getId())).fetch().isEmpty()
                 && taskDao.fetchByPerformerId(employee.getId()).isEmpty()) {
-//            context.delete(EMPLOYEE)
-//                    .where(EMPLOYEE.ID.eq(employee.getId()))
-//                    .execute();
-//
-//            employee.attach(context.configuration());
-//            employee.delete();
 
             employeeDao.deleteById(employee.getId());
 

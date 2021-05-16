@@ -15,11 +15,6 @@ public class EmployeeResource {
     private EmployeeService employeeService;
 
     @GET
-    public Response getEmployeesOld() {
-        return employeeService.getEmployeesOld();
-    }
-
-    @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployees(
@@ -63,6 +58,13 @@ public class EmployeeResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateEmployee(Employee employee) {
         return employeeService.updateEmployee(employee);
+    }
+
+    @POST
+    @Path("save")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response saveEmployee(Employee employee) {
+        return employeeService.saveEmployee(employee);
     }
 
     @POST

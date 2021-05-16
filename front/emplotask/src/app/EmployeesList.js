@@ -27,18 +27,10 @@ export function EmployeesList() {
 function EmployeeTable() {
     const dispatch = useDispatch();
     const employees = useSelector(state => state.employees);
-    const tasks = useSelector(state => state.tasks);
     const isEmloyeesLoaded = useSelector(state => state.isEmloyeesLoaded);
-    const isTasksLoaded = useSelector(state => state.isTasksLoaded);
     const classes = useStyles();
 
-    // считаем задачи у сотрудников
-    let taskCount = [];
-    tasks.forEach((element) => {
-        taskCount[element[3]] = taskCount[element[3]] ? ++taskCount[element[3]] : 1;
-    });
-
-    if (isEmloyeesLoaded && isTasksLoaded) {
+    if (isEmloyeesLoaded) {
         return (
             <table className={classes.table}>
                 <thead>
@@ -53,13 +45,13 @@ function EmployeeTable() {
                 </thead>
                 <tbody>
                     {employees.map((value, index) => (
-                        <tr key={index} onClick={() => dispatch(showEmployee(index))}>
-                            <td>{value[0]}</td>
-                            <td>{value[1]}</td>
-                            <td>{value[2]}</td>
-                            <td>{value[3]}</td>
-                            <td>{value[4] ? employees[value[4]][1] : ''}</td>
-                            <td>{taskCount[index] ? taskCount[index] : 0}</td>
+                        <tr key={index} onClick={() => dispatch(showEmployee({ ...value }))}>
+                            <td>{value.id}</td>
+                            <td>{value.name}</td>
+                            <td>{value.post}</td>
+                            <td>{value.branch}</td>
+                            <td>{value.bossName}</td>
+                            <td>{value.taskCount}</td>
                         </tr>
                     ))}
                 </tbody>

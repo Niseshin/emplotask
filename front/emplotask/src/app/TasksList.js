@@ -30,12 +30,6 @@ function TaskTable() {
     const isTasksLoaded = useSelector(state => state.isTasksLoaded);
     const classes = useStyles();
 
-    // сортировка по приоритету
-    let sortedTasks = tasks.slice();
-    sortedTasks.sort((a, b) => {
-        return b[1] - a[1];
-    })
-
     if (isTasksLoaded) {
         return (
             <table className={classes.table}>
@@ -48,12 +42,12 @@ function TaskTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedTasks.map((value, index) => (
-                        <tr key={index} onClick={() => dispatch(showTask(value[0]))}>
-                            <td>{value[0]}</td>
-                            <td>{value[1]}</td>
-                            <td>{value[2]}</td>
-                            <td>{value[4]}</td>
+                    {tasks.map((value, index) => (
+                        <tr key={index} onClick={() => dispatch(showTask({ ...value }))}>
+                            <td>{value.id}</td>
+                            <td>{value.priority}</td>
+                            <td>{value.description}</td>
+                            <td>{value.performerName}</td>
                         </tr>
                     ))}
                 </tbody>

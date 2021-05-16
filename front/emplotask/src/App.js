@@ -17,40 +17,29 @@ export function App() {
     console.log(state);
 
     if (!isEmloyeesLoaded) {
-        new Promise((resolve, reject) => {
-            const request = new XMLHttpRequest();
-            request.open('GET', 'http://localhost:8080/emplotask/resources/employees');
-            request.onload = () => {
-                if (request.status === 200) {
-                    resolve(request.response);
-                } else {
-                    reject(Error(request.statusText));
-                }
-            };
-            request.send();
-        }).then(result => {
-            dispatch(loadEmployeesList(JSON.parse(result).records));
-        });
+        fetch('http://localhost:8080/emplotask/resources/employees/listex', {
+            method: 'GET'
+        }).then((response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error(response.statusText);
+            }
+        }).then((result) => dispatch(loadEmployeesList(result)));
     }
 
     if (isEmloyeesLoaded && !isTasksLoaded) {
-        new Promise((resolve, reject) => {
-            const request = new XMLHttpRequest();
-            request.open('GET', 'http://localhost:8080/emplotask/resources/tasks');
-            request.onload = () => {
-                if (request.status === 200) {
-                    resolve(request.response);
-                } else {
-                    reject(Error(request.statusText));
-                }
-            };
-            request.send();
-        }).then(result => {
-            dispatch(loadTasksList(JSON.parse(result).records));
-        });
+        fetch('http://localhost:8080/emplotask/resources/tasks/listex', {
+            method: 'GET'
+        }).then((response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error(response.statusText);
+            }
+        }).then((result) => dispatch(loadTasksList(result)));
     }
 
-    // все рисуется на одной странице, хорошо ли это? *задумчивый смайлик*
     switch (page) {
         case 'employeesList':
             return (

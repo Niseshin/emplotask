@@ -4,8 +4,8 @@ import generated.tables.pojos.Employee;
 
 public class EmployeeExtended extends Employee {
 
-    String bossName;
-    Integer taskCount;
+    private String bossName;
+    private Integer taskCount;
 
     public EmployeeExtended(Integer id, String name, String post, String branch, Integer bossId, String bossName, Integer taskCount) {
         super(id, name, post, branch, bossId);

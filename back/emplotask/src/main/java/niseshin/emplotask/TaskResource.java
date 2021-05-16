@@ -15,15 +15,28 @@ public class TaskResource {
     private TaskService taskService;
 
     @GET
-    public Response getTasks() {
-        return taskService.getTasks();
+    @Path("list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTasks(
+            @DefaultValue("100") @QueryParam("lim") int limit,
+            @DefaultValue("0") @QueryParam("off") int offset) {
+        return taskService.getTasks(limit, offset);
     }
 
     @GET
-    @Path("get")
+    @Path("listex")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTasksThroughDao() {
-        return taskService.getTasksThroughDao();
+    public Response getTasksExtended(
+            @DefaultValue("100") @QueryParam("lim") int limit,
+            @DefaultValue("0") @QueryParam("off") int offset) {
+        return taskService.getTasksExtended(limit, offset);
+    }
+
+    @GET
+    @Path("taskpriority")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTaskPriority() {
+        return taskService.getTaskPriority();
     }
 
     @POST
@@ -38,6 +51,13 @@ public class TaskResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateTask(Task task) {
         return taskService.updateTask(task);
+    }
+
+    @POST
+    @Path("save")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response saveTask(Task task) {
+        return taskService.saveTask(task);
     }
 
     @POST
